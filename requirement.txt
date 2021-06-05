@@ -3,4 +3,4 @@ requests
 json
 pandas
 datetime
-PIL
+Pillow
