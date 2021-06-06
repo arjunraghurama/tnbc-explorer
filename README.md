@@ -1,6 +1,4 @@
-<p align="center">
-  TheNewBostonCoin Blockchain Explorer
-</p>
+#                         TheNewBostonCoin Blockchain Explorer
 
 ## Run the app locally
 ```bash
