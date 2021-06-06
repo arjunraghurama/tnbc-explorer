@@ -1,2 +1,2 @@
-# tnbc-explorer
-TheNewBostonCoin Blockchain Explorer
+# TheNewBostonCoin Blockchain Explorer
+
