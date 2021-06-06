@@ -1,4 +1,4 @@
-# TheNewBostonCoin Blockchain Explorer
+#<center>TheNewBostonCoin Blockchain Explorer</center>
 
 ## Run the app locally
 ```bash
