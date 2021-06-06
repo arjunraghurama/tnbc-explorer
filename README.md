@@ -1,5 +1,9 @@
 <center>#TheNewBostonCoin Blockchain Explorer</center>
 
+<p align="center">
+  TheNewBostonCoin Blockchain Explorer
+</p>
+
 ## Run the app locally
 ```bash
 git clone https://github.com/arjunraghurama/tnbc-explorer.git
