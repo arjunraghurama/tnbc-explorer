@@ -21,7 +21,7 @@ st.markdown("<h1 style='text-align: center; color: red;'>TheNewBostonCoin Blockc
 # Account balance
 def balance():
     account_number = st.text_input('Account number', '' ,help='Type your account number here to fetch the account balance')
-    if (st.button('Check Blance')):
+    if (st.button('Check Balance')):
         url = "http://{}/accounts/{}/balance".format(VALIDATOR_IP, account_number)
         payload={}
         headers = {}
