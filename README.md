@@ -8,7 +8,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## Check the live version here
+## Check the live version of app here
 https://tnbc-explorer.herokuapp.com/
   
 ## For more details on the blockchain
