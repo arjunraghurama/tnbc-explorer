@@ -37,7 +37,8 @@ def balance():
             headers = {}
             response = requests.request("GET", url, headers=headers, data=payload)
             balance = json.loads(response.text)['balance']
-            balance = "{:,}".format(balance)
+            if balance is not None:
+                balance = "{:,}".format(balance)
             st.markdown("<h3 style='text-align: center; color: green;'>Account balance is : {} TNBC </h3>".format(balance), unsafe_allow_html=True)
 
 balance()
