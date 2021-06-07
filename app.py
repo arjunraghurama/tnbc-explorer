@@ -28,6 +28,7 @@ def balance():
         else:
             session_state.isTransactionHistoryEnabled = True
             session_state.account_number_for_transaction_history = account_number
+            session_state.history_offset = 0
             url = "http://{}/accounts/{}/balance".format(VALIDATOR_IP, account_number)
             payload={}
             headers = {}
