@@ -88,7 +88,7 @@ def get_history_page_count(account_number):
     response = requests.request("GET", url, headers=headers, data=payload)
     count = int(json.loads(response.text)["count"])
     page = count // 10
-    st.write(count)
+    # st.write(count)
     return page
 
 account_transaction_history_per_page =10
