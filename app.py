@@ -15,8 +15,7 @@ st.set_page_config(
 
 VALIDATOR_IP = '54.219.183.128' 
 BANK_IP = "54.177.121.3"  
-default_account_number_for_history = '5ad13fd8cc674da7a3ad35426e0fcfe3a3157a044ebda0f54b9b32ee873ea921'
-session_state = SessionState.get(account_number_for_transaction_history = default_account_number_for_history)
+session_state = SessionState.get(account_number_for_transaction_history = 0, isTransactionHistoryEnabled = False, history_offset = 0, offset = 0)
 
 st.markdown("<h1 style='text-align: center; color: red;'>TheNewBostonCoin Blockchain Explorer</h1>", unsafe_allow_html=True)
 
@@ -27,6 +26,7 @@ def balance():
         if not account_number:
             st.markdown("<h3 style='text-align: center; color: red;'>Please enter a valid TNBC Account number</h3>", unsafe_allow_html=True)
         else:
+            session_state.isTransactionHistoryEnabled = True
             session_state.account_number_for_transaction_history = account_number
             url = "http://{}/accounts/{}/balance".format(VALIDATOR_IP, account_number)
             payload={}
@@ -92,32 +92,34 @@ def get_history_page_count(account_number):
     return page
 
 account_transaction_history_per_page =10
-   
-account_number = session_state.account_number_for_transaction_history
+ 
+if(session_state.isTransactionHistoryEnabled):
+        account_number = session_state.account_number_for_transaction_history
+        st.markdown("<h3 style='text-align: left; color: blue;'>Transaction history for the account : {} </h3>".format(account_number), unsafe_allow_html=True)
 
-st.markdown("<h3 style='text-align: left; color: blue;'>Transaction history for the account : {} </h3>".format(account_number), unsafe_allow_html=True)
 
-last_page = get_history_page_count(account_number) 
-session_state = SessionState.get(history_offset = 0)
 pv, _ ,nx = st.beta_columns([1, 10, 1])
-if nx.button("Next", key="prev_transaction_history_page"):
+if(session_state.isTransactionHistoryEnabled):
+    # session_state = SessionState.get(history_offset = 0)
+    last_page = get_history_page_count(session_state.account_number_for_transaction_history) 
+        if nx.button("Next", key="prev_transaction_history_page"):
 
-    if session_state.history_offset + 1 > last_page:
-        session_state.history_offset = 0
-    else:
-        session_state.history_offset += 1
+            if session_state.history_offset + 1 > last_page:
+                session_state.history_offset = 0
+            else:
+                session_state.history_offset += 1
 
-if pv.button("Previous", key="next_transaction_history_page"):
+        if pv.button("Previous", key="next_transaction_history_page"):
 
-    if session_state.history_offset - 1 < 0:
-        session_state.history_offset = last_page
-    else:
-        session_state.history_offset -= 1
+            if session_state.history_offset - 1 < 0:
+                session_state.history_offset = last_page
+            else:
+                session_state.history_offset -= 1
 
-history_progressbar = st.progress(0.0)
-history_start_index = session_state.history_offset * account_transaction_history_per_page 
-history_data = account_transaction_history(account_number, account_transaction_history_per_page,history_start_index, history_progressbar)
-st.table(history_data.set_index('Index'))
+        history_progressbar = st.progress(0.0)
+        history_start_index = session_state.history_offset * account_transaction_history_per_page 
+        history_data = account_transaction_history(account_number, account_transaction_history_per_page,history_start_index, history_progressbar)
+        st.table(history_data.set_index('Index'))
 
 
 #  Transactions
@@ -169,7 +171,7 @@ def get_transaction_df(limit, offset, progress_bar):
     })
 
 transactions_per_page = 10
-session_state = SessionState.get(offset = 0)
+# session_state = SessionState.get(offset = 0)
 
 last_page = get_page_count() 
 prev, _ ,nxt = st.beta_columns([1, 10, 1])
