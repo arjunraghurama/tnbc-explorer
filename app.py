@@ -200,7 +200,7 @@ end_idx = (1 + session_state.offset) * transactions_per_page
 
 progressbar = st.progress(0.0)
 data = get_transaction_df(transactions_per_page,start_idx,progressbar)
-st.table(data)
+st.table(data.set_index('Index'))
 
 
 footer="""<style>
