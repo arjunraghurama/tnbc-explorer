@@ -196,7 +196,7 @@ st.table(data.set_index('Index'))
 
 footer="""<style>
 a:link , a:visited{
-color: blue;
+color: #ecedf3;
 background-color: transparent;
 text-decoration: underline;
 }
@@ -212,13 +212,13 @@ position: fixed;
 left: 0;
 bottom: 0;
 width: 100%;
-background-color: white;
+background-color: black;
 color: black;
 text-align: center;
 }
 </style>
 <div class="footer">
-<p>Made with <a style="text-decoration:none" href="https://streamlit.io/" target="blank"> Streamlit </a>❤  <a> by</a><a style='display: block; text-align: center; text-decoration:none;' href="https://github.com/arjunraghurama" target="blank">Arjun</a></p>
+<p style='color: #ecedf3;'> Made with <a style="text-decoration:none" href="https://streamlit.io/" target="blank"> Streamlit </a>❤  <a> by</a><a style='display: block; text-align: center; text-decoration:none;' href="https://github.com/arjunraghurama" target="blank">Arjun</a></p>
 </div>
 """
 st.markdown(footer,unsafe_allow_html=True)
