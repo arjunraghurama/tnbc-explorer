@@ -99,9 +99,9 @@ if(session_state.isTransactionHistoryEnabled):
 
 
 pv, _ ,nx = st.beta_columns([1, 10, 1])
+
 if(session_state.isTransactionHistoryEnabled):
-    # session_state = SessionState.get(history_offset = 0)
-    last_page = get_history_page_count(session_state.account_number_for_transaction_history) 
+        last_page = get_history_page_count(session_state.account_number_for_transaction_history) 
         if nx.button("Next", key="prev_transaction_history_page"):
 
             if session_state.history_offset + 1 > last_page:
