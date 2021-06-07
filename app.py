@@ -21,7 +21,7 @@ st.markdown("<h1 style='text-align: center; color: red;'>TheNewBostonCoin Blockc
 
 # Account balance
 def balance():
-    account_number = st.text_input('Account number', value=session_state.account_number_for_transaction_history ,help='Type your account number here to fetch the account balance')
+    account_number = st.text_input('Account number', '' ,help='Type your account number here to fetch the account balance')
     if (st.button('Check Blance')):
         if not account_number:
             st.markdown("<h3 style='text-align: center; color: red;'>Please enter a valid TNBC Account number</h3>", unsafe_allow_html=True)
