@@ -17,12 +17,12 @@ VALIDATOR_IP = '54.219.183.128'
 BANK_IP = "54.177.121.3"  
 session_state = SessionState.get(account_number_for_transaction_history = 0, isTransactionHistoryEnabled = False, history_offset = 0, offset = 0)
 
-st.markdown("<h1 style='text-align: center; color: red;'>TheNewBostonCoin Blockchain Explorer</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #FAFAFA;'>TheNewBostonCoin Blockchain Explorer</h1>", unsafe_allow_html=True)
 
 # Account balance
 def balance():
     account_number = st.text_input('Account number', '' ,help='Type your account number here to fetch the account balance')
-    if (st.button('Check Blance')):
+    if (st.button('Check Balance')):
         if not account_number:
             st.markdown("<h3 style='text-align: center; color: red;'>Please enter a valid TNBC Account number</h3>", unsafe_allow_html=True)
         else:
@@ -41,7 +41,7 @@ balance()
 
 #  Transaction History for an account
 
-def account_transaction_history(account_number,limit,offset,history_progress_bar):
+def account_transaction_history(account_number,limit,offset):
     snd =[]
     rcv=[]
     tme=[]
@@ -70,7 +70,6 @@ def account_transaction_history(account_number,limit,offset,history_progress_bar
         amt.append(transaction["amount"])
         # fee.append(transaction["fee"])
         # memo.append(transaction["memo"])
-        history_progress_bar.progress( transaction_count /len(transactions) )
    
     return pd.DataFrame({
         "Index": idx,
@@ -96,7 +95,7 @@ account_transaction_history_per_page =10
  
 if(session_state.isTransactionHistoryEnabled):
         account_number = session_state.account_number_for_transaction_history
-        st.markdown("<h3 style='text-align: left; color: blue;'>Transaction history for the account : {} </h3>".format(account_number), unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: left; color: #ecedf3;'>Transaction history for the account : {} </h3>".format(account_number), unsafe_allow_html=True)
 
 
 pv, _ ,nx = st.beta_columns([1, 10, 1])
@@ -117,14 +116,13 @@ if(session_state.isTransactionHistoryEnabled):
             else:
                 session_state.history_offset -= 1
 
-        history_progressbar = st.progress(0.0)
         history_start_index = session_state.history_offset * account_transaction_history_per_page 
-        history_data = account_transaction_history(account_number, account_transaction_history_per_page,history_start_index, history_progressbar)
+        history_data = account_transaction_history(account_number, account_transaction_history_per_page,history_start_index)
         st.table(history_data.set_index('Index'))
 
 
 #  Transactions
-st.markdown("<h3 style='text-align: left; color: blue;'>Latest transactions on the network : </h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: left; color: #ecedf3;'>Latest transactions on the network : </h3>", unsafe_allow_html=True)
 
 def get_page_count():
     url = "http://{}/bank_transactions?limit={}".format(BANK_IP,5)
@@ -135,7 +133,7 @@ def get_page_count():
     page = count // 10
     return page
 
-def get_transaction_df(limit, offset, progress_bar):
+def get_transaction_df(limit, offset):
     
     snd =[]
     rcv=[]
@@ -161,7 +159,6 @@ def get_transaction_df(limit, offset, progress_bar):
         d = date_time.strftime("%d %B %Y, %H:%M:%S")
         tme.append(d+'Z')
         amt.append(transaction["amount"])
-        progress_bar.progress( itemCount /len(transactions) )
     
     return pd.DataFrame({
         "Index" : idx,
@@ -193,8 +190,7 @@ if prev.button("Previous"):
 start_idx = session_state.offset * transactions_per_page 
 end_idx = (1 + session_state.offset) * transactions_per_page 
 
-progressbar = st.progress(0.0)
-data = get_transaction_df(transactions_per_page,start_idx,progressbar)
+data = get_transaction_df(transactions_per_page,start_idx)
 st.table(data.set_index('Index'))
 
 
