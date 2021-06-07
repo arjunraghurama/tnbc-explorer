@@ -17,7 +17,10 @@ VALIDATOR_IP = '54.219.183.128'
 BANK_IP = "54.177.121.3"  
 session_state = SessionState.get(account_number_for_transaction_history = 0, isTransactionHistoryEnabled = False, history_offset = 0, offset = 0)
 
-st.markdown("<h1 style='text-align: center; color: #FAFAFA;'>TheNewBostonCoin Blockchain Explorer</h1>", unsafe_allow_html=True)
+# st.markdown("<h1 style='text-align: center; color: #FAFAFA;'>TheNewBostonCoin Blockchain Explorer</h1>", unsafe_allow_html=True)
+logo = Image.open('512px.png')
+_,logo_col,_ = st.beta_columns([1,2,1])
+logo_col.image(logo,use_column_width='always')
 
 # Account balance
 def balance():
