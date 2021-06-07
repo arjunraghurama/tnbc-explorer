@@ -15,25 +15,121 @@ st.set_page_config(
 
 VALIDATOR_IP = '54.219.183.128' 
 BANK_IP = "54.177.121.3"  
+default_account_number_for_history = '5ad13fd8cc674da7a3ad35426e0fcfe3a3157a044ebda0f54b9b32ee873ea921'
+session_state = SessionState.get(account_number_for_transaction_history = default_account_number_for_history)
 
 st.markdown("<h1 style='text-align: center; color: red;'>TheNewBostonCoin Blockchain Explorer</h1>", unsafe_allow_html=True)
 
 # Account balance
 def balance():
     account_number = st.text_input('Account number', '' ,help='Type your account number here to fetch the account balance')
-    if (st.button('Check Balance')):
-        url = "http://{}/accounts/{}/balance".format(VALIDATOR_IP, account_number)
-        payload={}
-        headers = {}
-        response = requests.request("GET", url, headers=headers, data=payload)
-        balance = json.loads(response.text)['balance']
+    if (st.button('Check Blance')):
+        if not account_number:
+            st.markdown("<h3 style='text-align: center; color: red;'>Please enter a valid TNBC Account number</h3>", unsafe_allow_html=True)
+        else:
+            session_state.account_number_for_transaction_history = account_number
+            url = "http://{}/accounts/{}/balance".format(VALIDATOR_IP, account_number)
+            payload={}
+            headers = {}
+            response = requests.request("GET", url, headers=headers, data=payload)
+            balance = json.loads(response.text)['balance']
         st.markdown("<h3 style='text-align: center; color: green;'>Account balance is : {} TNBC </h3>".format(balance), unsafe_allow_html=True)
 
 balance()
 
 
+#  Transaction History for an account
+
+def account_transaction_history(account_number,limit,offset,history_progress_bar):
+    snd =[]
+    rcv=[]
+    tme=[]
+    amt=[]
+    # fee=[]
+    # memo=[]
+
+    url = "http://{}/bank_transactions?account_number={}&block__sender=&fee=&limit={}&offset={}&recipient=".format(BANK_IP,account_number,limit,offset)
+    payload={}
+    headers = {}
+    response = requests.request("GET", url, headers=headers, data=payload)
+    
+    transactions = json.loads(response.text)["results"]
+    transaction_count =0
+
+    idx = [ x for x in range(offset+1, offset+1+len(transactions))]
+    for transaction in transactions:
+        transaction_count+=1
+        snd.append(transaction["block"]["sender"])
+        rcv.append(transaction["recipient"])
+        timestamp = transaction["block"]["modified_date"]
+        timestamp = timestamp.rstrip(timestamp[-1])
+        date_time = datetime.fromisoformat(timestamp)
+        d = date_time.strftime("%d %B %Y, %H:%M:%S")
+        tme.append(d+'Z')
+        amt.append(transaction["amount"])
+        # fee.append(transaction["fee"])
+        # memo.append(transaction["memo"])
+        history_progress_bar.progress( transaction_count /len(transactions) )
+   
+    return pd.DataFrame({
+        "Index": idx,
+        "Sender" :snd,
+        "Recipient": rcv,
+        "Time" : tme,
+        "Coins" :  amt,
+        # "Fees" : fee,
+        # "Memo":memo
+    })
+
+def get_history_page_count(account_number):
+    url = "http://{}/bank_transactions?account_number={}&block__sender=&fee=&recipient=".format(BANK_IP,account_number)
+    payload={}
+    headers = {}
+    response = requests.request("GET", url, headers=headers, data=payload)
+    count = int(json.loads(response.text)["count"])
+    page = count // 10
+    st.write(count)
+    return page
+
+account_transaction_history_per_page =10
+
+acc_number = st.text_input('Account number', value=session_state.account_number_for_transaction_history ,help='Type your account number here to fetch the account balance')
+
+if (st.button('Transaction History')):
+    if not acc_number and session_state.account_number_for_transaction_history:
+        st.markdown("<h3 style='text-align: center; color: red;'>Please enter a valid TNBC Account number</h3>", unsafe_allow_html=True)
+    else:
+        session_state.account_number_for_transaction_history = acc_number
+   
+account_number = session_state.account_number_for_transaction_history
+
+st.markdown("<h3 style='text-align: left; color: blue;'>Transaction history for the account : {} </h3>".format(session_state.account_number_for_transaction_history), unsafe_allow_html=True)
+
+last_page = get_history_page_count(session_state.account_number_for_transaction_history) 
+session_state = SessionState.get(history_offset = 0)
+pv, _ ,nx = st.beta_columns([1, 10, 1])
+if nx.button("Next", key="prev_transaction_history_page"):
+
+    if session_state.history_offset + 1 > last_page:
+        session_state.history_offset = 0
+    else:
+        session_state.history_offset += 1
+
+if pv.button("Previous", key="next_transaction_history_page"):
+
+    if session_state.history_offset - 1 < 0:
+        session_state.history_offset = last_page
+    else:
+        session_state.history_offset -= 1
+
+history_progressbar = st.progress(0.0)
+history_start_index = session_state.history_offset * account_transaction_history_per_page 
+history_data = account_transaction_history(account_number, account_transaction_history_per_page,history_start_index, history_progressbar)
+st.table(history_data.set_index('Index'))
+
+
 #  Transactions
-st.markdown("<h3 style='text-align: left; color: green;'>Latest Transactions</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: left; color: blue;'>Latest Transactions on the network : </h3>", unsafe_allow_html=True)
 
 def get_page_count():
     url = "http://{}/bank_transactions?limit={}".format(BANK_IP,5)
@@ -58,6 +154,7 @@ def get_transaction_df(limit, offset, progress_bar):
     
     transactions = json.loads(response.text)["results"]
     itemCount =0
+    idx = [ x for x in range(offset+1, offset+1+len(transactions))]
 
     for transaction in transactions:
         itemCount+=1
@@ -72,6 +169,7 @@ def get_transaction_df(limit, offset, progress_bar):
         progress_bar.progress( itemCount /len(transactions) )
     
     return pd.DataFrame({
+        "Index" : idx,
         "Sender" :snd,
         "Recipient": rcv,
         "Time" : tme,
