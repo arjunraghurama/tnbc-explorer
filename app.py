@@ -22,7 +22,7 @@ st.markdown("<h1 style='text-align: center; color: red;'>TheNewBostonCoin Blockc
 
 # Account balance
 def balance():
-    account_number = st.text_input('Account number', '' ,help='Type your account number here to fetch the account balance')
+    account_number = st.text_input('Account number', value=session_state.account_number_for_transaction_history ,help='Type your account number here to fetch the account balance')
     if (st.button('Check Blance')):
         if not account_number:
             st.markdown("<h3 style='text-align: center; color: red;'>Please enter a valid TNBC Account number</h3>", unsafe_allow_html=True)
@@ -92,20 +92,12 @@ def get_history_page_count(account_number):
     return page
 
 account_transaction_history_per_page =10
-
-acc_number = st.text_input('Account number', value=session_state.account_number_for_transaction_history ,help='Type your account number here to fetch the account balance')
-
-if (st.button('Transaction History')):
-    if not acc_number and session_state.account_number_for_transaction_history:
-        st.markdown("<h3 style='text-align: center; color: red;'>Please enter a valid TNBC Account number</h3>", unsafe_allow_html=True)
-    else:
-        session_state.account_number_for_transaction_history = acc_number
    
 account_number = session_state.account_number_for_transaction_history
 
-st.markdown("<h3 style='text-align: left; color: blue;'>Transaction history for the account : {} </h3>".format(session_state.account_number_for_transaction_history), unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: left; color: blue;'>Transaction history for the account : {} </h3>".format(account_number), unsafe_allow_html=True)
 
-last_page = get_history_page_count(session_state.account_number_for_transaction_history) 
+last_page = get_history_page_count(account_number) 
 session_state = SessionState.get(history_offset = 0)
 pv, _ ,nx = st.beta_columns([1, 10, 1])
 if nx.button("Next", key="prev_transaction_history_page"):
@@ -129,7 +121,7 @@ st.table(history_data.set_index('Index'))
 
 
 #  Transactions
-st.markdown("<h3 style='text-align: left; color: blue;'>Latest Transactions on the network : </h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: left; color: blue;'>Latest transactions on the network : </h3>", unsafe_allow_html=True)
 
 def get_page_count():
     url = "http://{}/bank_transactions?limit={}".format(BANK_IP,5)
