@@ -28,7 +28,7 @@ http://localhost:8501/
   
 ## For more details on the blockchain
 
-[![Hello](https://img.shields.io/badge/thenewboston-blockchin-blue?style=for-the-badge&logo=appveyor)](https://github.com/thenewboston-developers)
+[![Hello](https://img.shields.io/badge/thenewboston-blockchain-blue?style=for-the-badge&logo=appveyor)](https://github.com/thenewboston-developers)
 
 
 
