@@ -6,10 +6,13 @@
 This is a simple web app built with Streamlit. Main goal is to display tnbc account balance, account transaction history and the transactions that occur on the network.
 
 ## Getting Started
-* ### Local 
+Clone the repo
 ```bash
 git clone https://github.com/arjunraghurama/tnbc-explorer.git
 cd tnbc-explorer
+```
+* ### Local 
+```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
