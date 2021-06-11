@@ -17,7 +17,6 @@ VALIDATOR_IP = '54.219.183.128'
 BANK_IP = "54.177.121.3"  
 session_state = SessionState.get(account_number_for_transaction_history = 0, isTransactionHistoryEnabled = False, history_offset = 0, offset = 0)
 
-# st.markdown("<h1 style='text-align: center; color: #FAFAFA;'>TheNewBostonCoin Blockchain Explorer</h1>", unsafe_allow_html=True)
 logo = Image.open('512px.png')
 _,logo_col,_ = st.beta_columns([1,2,1])
 logo_col.image(logo,use_column_width='always')
@@ -39,13 +38,13 @@ def balance():
             balance = json.loads(response.text)['balance']
             if balance is not None:
                 balance = "{:,}".format(balance)
+            else:
+                balance = 0
             st.markdown("<h3 style='text-align: center; color: green;'>Account balance is : {} TNBC </h3>".format(balance), unsafe_allow_html=True)
 
 balance()
 
-
 #  Transaction History for an account
-
 def account_transaction_history(account_number,limit,offset):
     snd =[]
     rcv=[]
@@ -174,7 +173,6 @@ def get_transaction_df(limit, offset):
     })
 
 transactions_per_page = 10
-# session_state = SessionState.get(offset = 0)
 
 last_page = get_page_count() 
 prev, _ ,nxt = st.beta_columns([1, 10, 1])
