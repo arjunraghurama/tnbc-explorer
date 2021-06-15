@@ -1,8 +1,13 @@
-<p align="center">
+<!-- <p align="center">
   <img alt="thenewboston logo" src="./tnb.png" width="400">
-</p>
+</p> -->
 
 # TheNewBostonCoin Blockchain Explorer
+
+<p align="center">
+  <img alt="thenewboston logo" src="./site.png">
+</p>
+
 This is a simple web app built with Streamlit. Main goal is to display tnbc account balance, account transaction history and the transactions that occur on the network.
 
 ## Getting Started
