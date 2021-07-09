@@ -14,7 +14,7 @@ st.set_page_config(
     )
 
 VALIDATOR_IP = '54.219.183.128' 
-BANK_IP = "54.177.121.3"  
+BANK_IP = "54.183.16.194"  
 session_state = SessionState.get(account_number_for_transaction_history = 0, isTransactionHistoryEnabled = False, history_offset = 0, offset = 0)
 
 logo = Image.open('512px.png')
