@@ -2,7 +2,7 @@
   <img alt="thenewboston logo" src="./tnb.png" width="400">
 </p> -->
 
-# thenewboston Blockchain Explorer
+# thenewboston blockchain explorer
 
 <p align="center">
   <img alt="thenewboston logo" src="./site.png">
