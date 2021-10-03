@@ -13,7 +13,7 @@ st.set_page_config(
         layout="wide",
     )
 
-VALIDATOR_IP = '54.219.183.128' 
+VALIDATOR_IP = '54.219.234.129' 
 BANK_IP = "54.183.16.194"  
 session_state = SessionState.get(account_number_for_transaction_history = 0, isTransactionHistoryEnabled = False, history_offset = 0, offset = 0)
 
