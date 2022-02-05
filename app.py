@@ -5,7 +5,6 @@ import json
 import pandas as pd
 from datetime import datetime
 from PIL import Image
-# import SessionState
 from streamlit import session_state
 
 image = Image.open('logo.png')
