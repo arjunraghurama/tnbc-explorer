@@ -18,10 +18,17 @@ st.set_page_config(
 VALIDATOR_IP = '52.52.160.149'
 BANK_IP = "54.183.16.194"  
 
-session_state["account_number_for_transaction_history"] = 0
-session_state["isTransactionHistoryEnabled"] = 0
-session_state["history_offset"] = 0
-session_state["offset"] = 0
+if "account_number_for_transaction_history" not in session_state:
+    session_state["account_number_for_transaction_history"] = 0
+
+if "isTransactionHistoryEnabled" not in session_state:
+    session_state["isTransactionHistoryEnabled"] = False
+
+if "history_offset" not in session_state:
+    session_state["history_offset"] = 0
+
+if "offset" not in session_state:
+    session_state["offset"] = 0
 
 logo = Image.open('512px.png')
 _,logo_col,_ = st.columns([1,2,1])
@@ -209,14 +216,14 @@ if nxt.button("Next"):
     if session_state["offset"] + 1 > last_page:
         session_state["offset"] = 0
     else:
-        session_state["offset"] += 1
+        session_state["offset"] = session_state["offset"]+1
 
 if prev.button("Previous"):
 
     if session_state["offset"] - 1 < 0:
         session_state["offset"] = last_page
     else:
-        session_state["offset"] -= 1
+        session_state["offset"] = session_state["offset"] - 1
 
 start_idx = session_state["offset"] * transactions_per_page 
 end_idx = (1 + session_state["offset"]) * transactions_per_page 
