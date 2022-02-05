@@ -16,16 +16,12 @@ st.set_page_config(
     )
 
 VALIDATOR_IP = '52.52.160.149'
-# VALIDATOR_IP = '52.52.160.148' 
-
 BANK_IP = "54.183.16.194"  
-# session_state = SessionState.get(account_number_for_transaction_history = 0, isTransactionHistoryEnabled = False, history_offset = 0, offset = 0)
+
 session_state["account_number_for_transaction_history"] = 0
 session_state["isTransactionHistoryEnabled"] = 0
 session_state["history_offset"] = 0
 session_state["offset"] = 0
-
-
 
 logo = Image.open('512px.png')
 _,logo_col,_ = st.columns([1,2,1])
