@@ -1,10 +1,12 @@
 import streamlit as st
 import requests
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
 import pandas as pd
 from datetime import datetime
 from PIL import Image
-import SessionState
+# import SessionState
+from streamlit import session_state
 
 image = Image.open('logo.png')
 st.set_page_config(
@@ -13,13 +15,36 @@ st.set_page_config(
         layout="wide",
     )
 
-VALIDATOR_IP = '52.52.160.149' 
+VALIDATOR_IP = '52.52.160.149'
+# VALIDATOR_IP = '52.52.160.148' 
+
 BANK_IP = "54.183.16.194"  
-session_state = SessionState.get(account_number_for_transaction_history = 0, isTransactionHistoryEnabled = False, history_offset = 0, offset = 0)
+# session_state = SessionState.get(account_number_for_transaction_history = 0, isTransactionHistoryEnabled = False, history_offset = 0, offset = 0)
+session_state["account_number_for_transaction_history"] = 0
+session_state["isTransactionHistoryEnabled"] = 0
+session_state["history_offset"] = 0
+session_state["offset"] = 0
+
+
 
 logo = Image.open('512px.png')
-_,logo_col,_ = st.beta_columns([1,2,1])
+_,logo_col,_ = st.columns([1,2,1])
 logo_col.image(logo,use_column_width='always')
+
+
+# Bank IP and Validator node IP
+# This will change in the future
+def changeBankIp(IP):
+    BANK_IP=IP
+
+def changeValidatorIp(IP):
+   VALIDATOR_IP=IP
+
+_, bank_ip = st.columns([10,2])
+_, validator_ip = st.columns([10,2])
+
+BANK_IP  = bank_ip.text_input("BANK-IP", value=BANK_IP, on_change=changeBankIp(BANK_IP))
+VALIDATOR_IP = validator_ip.text_input("VALIDATOR-IP", value=VALIDATOR_IP,on_change=changeValidatorIp(VALIDATOR_IP))
 
 # Account balance
 def balance():
@@ -28,19 +53,22 @@ def balance():
         if not account_number:
             st.markdown("<h3 style='text-align: center; color: red;'>Please enter a valid TNBC Account number</h3>", unsafe_allow_html=True)
         else:
-            session_state.isTransactionHistoryEnabled = True
-            session_state.account_number_for_transaction_history = account_number
-            session_state.history_offset = 0
+            session_state["isTransactionHistoryEnabled"] = True
+            session_state["account_number_for_transaction_history"] = account_number
+            session_state["history_offset"] = 0
             url = "http://{}/accounts/{}/balance".format(VALIDATOR_IP, account_number)
             payload={}
             headers = {}
-            response = requests.request("GET", url, headers=headers, data=payload)
-            balance = json.loads(response.text)['balance']
-            if balance is not None:
-                balance = "{:,}".format(balance)
-            else:
-                balance = 0
-            st.markdown("<h3 style='text-align: center; color: green;'>Account balance is : {} TNBC </h3>".format(balance), unsafe_allow_html=True)
+            try:
+                response = requests.request("GET", url, headers=headers, data=payload, timeout=5)
+                balance = json.loads(response.text)['balance']
+                if balance is not None:
+                    balance = "{:,}".format(balance)
+                else:
+                    balance = 0
+                st.markdown("<h3 style='text-align: center; color: green;'>Account balance is : {} TNBC </h3>".format(balance), unsafe_allow_html=True)
+            except (ConnectionError, Timeout, TooManyRedirects, Exception) as e:
+                st.markdown("<h3 style='text-align: center; color: red;'>Uh oh! Unable to connect to Validator Node!</h3>", unsafe_allow_html=True)
 
 balance()
 
@@ -51,7 +79,7 @@ def account_transaction_history(account_number,limit,offset):
     tme=[]
     amt=[]
     # fee=[]
-    # memo=[]
+    memo=[]
 
     url = "http://{}/bank_transactions?account_number={}&block__sender=&fee=&limit={}&offset={}&recipient=".format(BANK_IP,account_number,limit,offset)
     payload={}
@@ -73,16 +101,17 @@ def account_transaction_history(account_number,limit,offset):
         tme.append(d+'Z')
         amt.append(transaction["amount"])
         # fee.append(transaction["fee"])
-        # memo.append(transaction["memo"])
+        memo.append(transaction["memo"])
    
     return pd.DataFrame({
         "Index": idx,
         "Sender" :snd,
         "Recipient": rcv,
         "Time" : tme,
-        "Coins" :  amt,
+        "Memo":memo,
+        "Coins" :  amt
         # "Fees" : fee,
-        # "Memo":memo
+        
     })
 
 def get_history_page_count(account_number):
@@ -97,30 +126,30 @@ def get_history_page_count(account_number):
 
 account_transaction_history_per_page =10
  
-if(session_state.isTransactionHistoryEnabled):
-        account_number = session_state.account_number_for_transaction_history
+if(session_state["isTransactionHistoryEnabled"]):
+        account_number = session_state["account_number_for_transaction_history"]
         st.markdown("<h3 style='text-align: left; color: #ecedf3;'>Transaction history for the account : {} </h3>".format(account_number), unsafe_allow_html=True)
 
 
-pv, _ ,nx = st.beta_columns([1, 10, 1])
+pv, _ ,nx = st.columns([1, 10, 1])
 
-if(session_state.isTransactionHistoryEnabled):
-        last_page = get_history_page_count(session_state.account_number_for_transaction_history) 
+if(session_state["isTransactionHistoryEnabled"]):
+        last_page = get_history_page_count(session_state["account_number_for_transaction_history"]) 
         if nx.button("Next", key="prev_transaction_history_page"):
 
-            if session_state.history_offset + 1 > last_page:
-                session_state.history_offset = 0
+            if session_state["history_offset"] + 1 > last_page:
+                session_state["history_offset"] = 0
             else:
-                session_state.history_offset += 1
+                session_state["history_offset"] += 1
 
         if pv.button("Previous", key="next_transaction_history_page"):
 
-            if session_state.history_offset - 1 < 0:
-                session_state.history_offset = last_page
+            if session_state["history_offset"] - 1 < 0:
+                session_state["history_offset"] = last_page
             else:
-                session_state.history_offset -= 1
+                session_state["history_offset"] -= 1
 
-        history_start_index = session_state.history_offset * account_transaction_history_per_page 
+        history_start_index = session_state["history_offset"] * account_transaction_history_per_page 
         history_data = account_transaction_history(account_number, account_transaction_history_per_page,history_start_index)
         st.table(history_data.set_index('Index'))
 
@@ -143,6 +172,7 @@ def get_transaction_df(limit, offset):
     rcv=[]
     tme=[]
     amt=[]
+    memo=[]
 
     url = "http://{}/bank_transactions?limit={}&offset={}".format(BANK_IP,limit,offset)
     payload={}
@@ -163,35 +193,37 @@ def get_transaction_df(limit, offset):
         d = date_time.strftime("%d %B %Y, %H:%M:%S")
         tme.append(d+'Z')
         amt.append(transaction["amount"])
+        memo.append(transaction["memo"])
     
     return pd.DataFrame({
         "Index" : idx,
         "Sender" :snd,
         "Recipient": rcv,
         "Time" : tme,
+        "Memo" : memo,
         "Coins" :  amt
     })
 
 transactions_per_page = 10
 
 last_page = get_page_count() 
-prev, _ ,nxt = st.beta_columns([1, 10, 1])
+prev, _ ,nxt = st.columns([1, 10, 1])
 if nxt.button("Next"):
 
-    if session_state.offset + 1 > last_page:
-        session_state.offset = 0
+    if session_state["offset"] + 1 > last_page:
+        session_state["offset"] = 0
     else:
-        session_state.offset += 1
+        session_state["offset"] += 1
 
 if prev.button("Previous"):
 
-    if session_state.offset - 1 < 0:
-        session_state.offset = last_page
+    if session_state["offset"] - 1 < 0:
+        session_state["offset"] = last_page
     else:
-        session_state.offset -= 1
+        session_state["offset"] -= 1
 
-start_idx = session_state.offset * transactions_per_page 
-end_idx = (1 + session_state.offset) * transactions_per_page 
+start_idx = session_state["offset"] * transactions_per_page 
+end_idx = (1 + session_state["offset"]) * transactions_per_page 
 
 data = get_transaction_df(transactions_per_page,start_idx)
 st.table(data.set_index('Index'))
